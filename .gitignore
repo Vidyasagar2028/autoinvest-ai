@@ -1,0 +1,18 @@
+*.iml
+.gradle/
+local.properties
+.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+
+# Android Studio
+.navigation/
+
+# Kotlin
+*.class
+
+# Generated
+/app/build/
