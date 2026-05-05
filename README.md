@@ -23,3 +23,15 @@ AutoInvest AI is a Kotlin-based Android app with:
 ```bash
 ./gradlew :app:assembleDebug
 ```
+
+## Web Trading Dashboard (React + Tailwind CDN)
+
+A premium, mobile-first trading dashboard is available as a single self-contained file at `web-dashboard/index.html` and runs with zero npm install.
+
+### Quick preview (local static server)
+
+```bash
+open web-dashboard/index.html
+```
+
+You can also double-tap/open the file directly in Safari on iPad.
