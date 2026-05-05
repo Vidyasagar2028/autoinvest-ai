@@ -11,29 +11,26 @@
         theme: {
           extend: {
             keyframes: {
-              fadeIn: {
-                '0%': { opacity: '0', transform: 'translateY(8px)' },
-                '100%': { opacity: '1', transform: 'translateY(0)' }
-              }
+              fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+              shimmer: { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
+              glowPulse: { '0%,100%': { boxShadow: '0 0 0 rgba(16,185,129,.0)' }, '50%': { boxShadow: '0 0 24px rgba(16,185,129,.32)' } }
             },
             animation: {
-              fadeIn: 'fadeIn 450ms ease-out forwards'
+              fadeIn: 'fadeIn .45s ease-out forwards',
+              shimmer: 'shimmer 1.8s linear infinite',
+              glowPulse: 'glowPulse 2.4s ease-in-out infinite'
             }
           }
         }
       }
     </script>
     <script type="importmap">
-      {
-        "imports": {
-          "react": "https://esm.sh/react@18.3.1",
-          "react-dom/client": "https://esm.sh/react-dom@18.3.1/client"
-        }
-      }
+      {"imports":{"react":"https://esm.sh/react@18.3.1","react-dom/client":"https://esm.sh/react-dom@18.3.1/client"}}
     </script>
   </head>
   <body class="bg-slate-950 text-slate-100 antialiased">
-    <div id="root"></div>
+    <div class="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_15%_10%,rgba(16,185,129,.12),transparent_38%),radial-gradient(circle_at_85%_20%,rgba(59,130,246,.12),transparent_34%)]"></div>
+    <div id="root" class="relative"></div>
 
     <script type="module">
       import React, { useEffect, useState } from 'react'
@@ -45,17 +42,13 @@
         { symbol: 'TSLA', entry: '$175.00', sl: '$168.00', target: '$186.00', current: '$167.25', status: 'SL Hit', pnl: -4.43 }
       ]
 
-      const statusMap = {
-        Running: 'bg-sky-500/15 text-sky-300',
-        'Target Hit': 'bg-emerald-500/15 text-emerald-300',
-        'SL Hit': 'bg-rose-500/15 text-rose-300'
-      }
+      const statusMap = { Running: 'bg-sky-500/15 text-sky-300', 'Target Hit': 'bg-emerald-500/15 text-emerald-300', 'SL Hit': 'bg-rose-500/15 text-rose-300' }
 
-      function StatCard({ title, value, tone = 'text-slate-100', subtitle }) {
-        return React.createElement('div', { className: 'animate-fadeIn rounded-2xl border border-slate-800 bg-slate-900/90 p-4 shadow-lg shadow-black/40 transition hover:-translate-y-0.5 hover:border-slate-700' }, [
-          React.createElement('p', { className: 'text-xs uppercase tracking-wide text-slate-400', key: 't' }, title),
-          React.createElement('p', { className: `mt-2 text-xl font-semibold ${tone}`, key: 'v' }, value),
-          subtitle && React.createElement('p', { className: 'mt-1 text-xs text-slate-500', key: 's' }, subtitle)
+      function StatCard({ title, value, tone = 'text-slate-100', subtitle, featured = false }) {
+        return React.createElement('div', { className: `animate-fadeIn rounded-3xl border p-4 backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 ${featured ? 'border-emerald-400/45 bg-emerald-500/10 shadow-[0_0_34px_rgba(16,185,129,.25)] animate-glowPulse' : 'border-slate-700/70 bg-white/[0.04] shadow-[0_8px_24px_rgba(0,0,0,.28)] hover:border-slate-500/80'}` }, [
+          React.createElement('p', { className: `uppercase tracking-widest ${featured ? 'text-[10px] text-emerald-200/90' : 'text-[10px] text-slate-400'}`, key: 't' }, title),
+          React.createElement('p', { className: `${featured ? 'mt-2 text-3xl font-extrabold' : 'mt-2 text-lg font-semibold'} ${tone}`, key: 'v' }, value),
+          subtitle && React.createElement('p', { className: `${featured ? 'text-emerald-100/80' : 'text-slate-500'} mt-1 text-xs`, key: 's' }, subtitle)
         ])
       }
 
@@ -64,75 +57,60 @@
         const [automationOn, setAutomationOn] = useState(true)
 
         useEffect(() => {
-          const timer = setTimeout(() => setLoading(false), 800)
+          const timer = setTimeout(() => setLoading(false), 900)
           return () => clearTimeout(timer)
         }, [])
 
-        return React.createElement('main', { className: 'min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 p-4 pb-10 sm:p-6' },
+        return React.createElement('main', { className: 'min-h-screen p-4 pb-10 sm:p-6' },
           React.createElement('div', { className: 'mx-auto max-w-5xl space-y-5' }, [
-            React.createElement('header', { className: 'animate-fadeIn rounded-2xl border border-slate-800 bg-slate-900/90 p-4 shadow-xl shadow-black/40', key: 'h' },
+            React.createElement('header', { className: 'animate-fadeIn rounded-3xl border border-emerald-300/20 bg-gradient-to-r from-slate-900/85 via-slate-900/70 to-slate-900/85 p-4 backdrop-blur-xl shadow-[0_10px_30px_rgba(16,185,129,.12)]', key: 'h' },
               React.createElement('div', { className: 'flex items-center justify-between' }, [
-                React.createElement('h1', { className: 'text-xl font-bold sm:text-2xl', key: 'n' }, 'AutoInvest AI'),
-                React.createElement('div', { className: 'flex items-center gap-2 rounded-full bg-slate-800 px-3 py-1 text-xs text-slate-300', key: 'm' }, [
-                  React.createElement('span', { className: 'h-2 w-2 rounded-full bg-emerald-400 animate-pulse', key: 'd' }),
-                  'Live Mode'
-                ])
+                React.createElement('div', { className: 'flex items-center gap-3', key: 'l' }, [
+                  React.createElement('div', { className: 'grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-emerald-400 to-cyan-400 text-slate-950 shadow-lg shadow-emerald-500/30', key: 'i' }, '◉'),
+                  React.createElement('div', { key: 'n' }, [
+                    React.createElement('h1', { className: 'text-xl font-black tracking-tight sm:text-2xl' }, 'AutoInvest AI'),
+                    React.createElement('p', { className: 'text-xs text-slate-400' }, 'Quant-driven automation dashboard')
+                  ])
+                ]),
+                React.createElement('div', { className: 'flex items-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200', key: 'm' }, [React.createElement('span', { className: 'h-2 w-2 rounded-full bg-emerald-300 animate-pulse', key: 'd' }), 'Live Mode'])
               ])
             ),
             React.createElement('section', { className: 'grid gap-3 sm:grid-cols-2 lg:grid-cols-4', key: 'p' }, loading
-              ? [1, 2, 3, 4].map((k) => React.createElement('div', { key: k, className: 'rounded-2xl border border-slate-800 bg-slate-900/70 p-4' },
-                  React.createElement('div', { className: 'h-4 w-24 rounded bg-slate-800 animate-pulse' })
-                ))
+              ? [1, 2, 3, 4].map((k) => React.createElement('div', { key: k, className: 'rounded-3xl border border-slate-700/70 bg-white/[0.04] p-4 backdrop-blur-xl' }, React.createElement('div', { className: 'h-16 rounded-xl bg-[linear-gradient(110deg,rgba(51,65,85,.4),rgba(100,116,139,.5),rgba(51,65,85,.4))] bg-[length:200%_100%] animate-shimmer' })))
               : [
-                  React.createElement(StatCard, { title: 'Total Capital', value: '$240,500', key: 1 }),
-                  React.createElement(StatCard, { title: 'Total P&L', value: '+$18,430', tone: 'text-emerald-400', subtitle: '+8.3% overall', key: 2 }),
-                  React.createElement(StatCard, { title: "Today\'s P&L", value: '-$420', tone: 'text-rose-400', subtitle: '-0.17% today', key: 3 }),
-                  React.createElement(StatCard, { title: 'Capital Deployed', value: '73%', subtitle: '$175,600 in active positions', key: 4 })
+                  React.createElement(StatCard, { title: 'Total Capital', value: '$240,500', subtitle: 'Account value', key: 1 }),
+                  React.createElement(StatCard, { title: 'Total P&L', value: '+$18,430', tone: 'text-emerald-300', subtitle: '+8.3% overall', featured: true, key: 2 }),
+                  React.createElement(StatCard, { title: "Today\'s P&L", value: '-$420', tone: 'text-rose-300', subtitle: '-0.17% today', key: 3 }),
+                  React.createElement(StatCard, { title: 'Capital Deployed', value: '73%', subtitle: '$175,600 active', key: 4 })
                 ]),
             React.createElement('section', { className: 'grid gap-5 lg:grid-cols-3', key: 'b' }, [
-              React.createElement('div', { className: 'space-y-3 lg:col-span-2', key: 't' }, [
-                React.createElement('h2', { className: 'text-lg font-semibold', key: 'tt' }, 'Active Trades'),
-                React.createElement('div', { className: 'grid gap-3 sm:grid-cols-2', key: 'tc' }, trades.map((trade) =>
-                  React.createElement('article', { key: trade.symbol, className: 'animate-fadeIn rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-md shadow-black/40' }, [
-                    React.createElement('div', { className: 'flex items-center justify-between', key: 'r1' }, [
-                      React.createElement('h3', { className: 'text-base font-semibold', key: 's' }, trade.symbol),
-                      React.createElement('span', { className: `rounded-full px-3 py-1 text-xs ${statusMap[trade.status]}`, key: 'st' }, trade.status)
-                    ]),
-                    React.createElement('p', { className: 'mt-2 text-sm text-slate-300', key: 'r2' }, `Entry ${trade.entry} • SL ${trade.sl} • Target ${trade.target}`),
-                    React.createElement('p', { className: 'mt-1 text-sm text-slate-300', key: 'r3' }, `Current ${trade.current}`),
-                    React.createElement('p', { className: `mt-2 text-sm font-semibold ${trade.pnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`, key: 'r4' }, `P&L ${trade.pnl > 0 ? '+' : ''}${trade.pnl}%`)
-                  ])
-                ))
-              ]),
-              React.createElement('div', { className: 'space-y-5', key: 'r' }, [
-                React.createElement('section', { className: 'rounded-2xl border border-slate-800 bg-slate-900/85 p-4', key: 'rm' }, [
-                  React.createElement('h2', { className: 'font-semibold', key: 'h' }, 'Risk Management'),
-                  React.createElement('p', { className: 'mt-2 text-sm text-slate-300', key: 1 }, 'Risk per trade: 1.5%'),
-                  React.createElement('p', { className: 'text-sm text-slate-300', key: 2 }, 'Max active trades: 6'),
-                  React.createElement('p', { className: 'text-sm text-slate-300', key: 3 }, 'Current exposure: 52%'),
-                  React.createElement('span', { className: 'mt-2 inline-block rounded-full bg-amber-500/10 px-2 py-1 text-xs text-amber-300', key: 4 }, 'Moderate')
-                ]),
-                React.createElement('section', { className: 'rounded-2xl border border-slate-800 bg-slate-900/85 p-4', key: 'ai' }, [
-                  React.createElement('div', { className: 'flex items-center justify-between', key: 'a' }, [
-                    React.createElement('h2', { className: 'font-semibold', key: 'h' }, 'Auto-Invest'),
-                    React.createElement('button', { className: `relative h-7 w-14 rounded-full ${automationOn ? 'bg-emerald-500' : 'bg-slate-700'}`, onClick: () => setAutomationOn(!automationOn), key: 'b' },
-                      React.createElement('span', { className: `absolute top-1 h-5 w-5 rounded-full bg-white transition ${automationOn ? 'left-8' : 'left-1'}` })
-                    )
-                  ]),
-                  React.createElement('p', { className: `mt-2 text-sm ${automationOn ? 'text-emerald-300' : 'text-slate-400'}`, key: 's' }, automationOn ? 'Automation Active' : 'Paused')
-                ]),
-                React.createElement('section', { className: 'rounded-2xl border border-slate-800 bg-slate-900/85 p-4', key: 'pf' }, [
-                  React.createElement('h2', { className: 'font-semibold', key: 'h' }, 'Performance'),
-                  React.createElement('p', { className: 'mt-2 text-sm text-emerald-400', key: 1 }, 'Weekly P&L: +$2,190'),
-                  React.createElement('p', { className: 'text-sm text-slate-300', key: 2 }, 'Win rate: 68%'),
-                  React.createElement('p', { className: 'text-sm text-slate-300', key: 3 }, 'Total trades: 124')
+              React.createElement('div', { className: 'space-y-3 lg:col-span-2', key: 't' }, [React.createElement('h2', { className: 'text-lg font-semibold tracking-tight' }, 'Active Trades'), React.createElement('div', { className: 'grid gap-3 sm:grid-cols-2' }, trades.map((trade) => {
+                const positive = trade.pnl > 2.5
+                const negative = trade.pnl < 0
+                const entry = parseFloat(trade.entry.replace('$', ''))
+                const current = parseFloat(trade.current.replace('$', ''))
+                const target = parseFloat(trade.target.replace('$', ''))
+                const progress = Math.max(0, Math.min(100, ((current - entry) / (target - entry)) * 100))
+                return React.createElement('article', { key: trade.symbol, className: `animate-fadeIn rounded-3xl border p-4 backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 ${positive ? 'border-emerald-400/45 bg-emerald-500/10 shadow-[0_0_22px_rgba(16,185,129,.2)]' : negative ? 'border-rose-400/40 bg-rose-500/10 shadow-[0_0_22px_rgba(244,63,94,.15)]' : 'border-slate-700/70 bg-white/[0.04] shadow-[0_8px_24px_rgba(0,0,0,.28)]'}` }, [
+                  React.createElement('div', { className: 'flex items-center justify-between', key: 'r1' }, [React.createElement('h3', { className: 'text-base font-semibold' }, trade.symbol), React.createElement('span', { className: `rounded-full px-3 py-1 text-xs ${statusMap[trade.status]}` }, trade.status)]),
+                  React.createElement('p', { className: 'mt-2 text-sm text-slate-300', key: 'r2' }, `Entry ${trade.entry} • SL ${trade.sl} • Target ${trade.target}`),
+                  React.createElement('p', { className: 'mt-1 text-sm text-slate-300', key: 'r3' }, `Current ${trade.current}`),
+                  React.createElement('div', { className: 'mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-700/70', key: 'pr' }, React.createElement('div', { className: `h-full rounded-full ${negative ? 'bg-rose-400' : 'bg-emerald-400'}`, style: { width: `${progress}%` } })),
+                  React.createElement('p', { className: `mt-2 text-sm font-semibold ${trade.pnl >= 0 ? 'text-emerald-300' : 'text-rose-300'}`, key: 'r4' }, `P&L ${trade.pnl > 0 ? '+' : ''}${trade.pnl}%`)
                 ])
+              }))]),
+              React.createElement('div', { className: 'space-y-5', key: 'r' }, [
+                React.createElement('section', { className: 'rounded-3xl border border-sky-400/20 bg-sky-500/5 p-4 backdrop-blur-xl shadow-[0_8px_24px_rgba(0,0,0,.28)] transition hover:-translate-y-0.5' }, [React.createElement('h2', { className: 'font-semibold' }, 'Risk Management'), React.createElement('p', { className: 'mt-2 text-sm text-slate-300' }, 'Risk per trade: 1.5%'), React.createElement('p', { className: 'text-sm text-slate-300' }, 'Max active trades: 6'), React.createElement('p', { className: 'text-sm text-slate-300' }, 'Current exposure: 52%'), React.createElement('span', { className: 'mt-2 inline-block rounded-full bg-amber-500/15 px-2 py-1 text-xs text-amber-200' }, 'Moderate')]),
+                React.createElement('section', { className: 'rounded-3xl border border-emerald-400/20 bg-emerald-500/5 p-4 backdrop-blur-xl shadow-[0_8px_24px_rgba(0,0,0,.28)]' }, [
+                  React.createElement('div', { className: 'flex items-center justify-between' }, [React.createElement('h2', { className: 'font-semibold' }, 'Auto-Invest'), React.createElement('button', { className: `relative h-7 w-14 rounded-full transition-all duration-300 ${automationOn ? 'bg-emerald-500 shadow-[0_0_14px_rgba(16,185,129,.45)]' : 'bg-slate-700'}`, onClick: () => setAutomationOn(!automationOn) }, React.createElement('span', { className: `absolute top-1 h-5 w-5 rounded-full bg-white transition-all duration-300 ${automationOn ? 'left-8' : 'left-1'}` }))]),
+                  React.createElement('p', { className: `mt-2 text-sm ${automationOn ? 'text-emerald-200' : 'text-slate-400'}` }, automationOn ? 'Automation Active' : 'Paused')
+                ]),
+                React.createElement('section', { className: 'rounded-3xl border border-fuchsia-400/20 bg-fuchsia-500/5 p-4 backdrop-blur-xl shadow-[0_8px_24px_rgba(0,0,0,.28)] transition hover:-translate-y-0.5' }, [React.createElement('h2', { className: 'font-semibold' }, 'Performance'), React.createElement('p', { className: 'mt-2 text-sm text-emerald-300' }, 'Weekly P&L: +$2,190'), React.createElement('p', { className: 'text-sm text-slate-300' }, 'Win rate: 68%'), React.createElement('p', { className: 'text-sm text-slate-300' }, 'Total trades: 124')])
               ])
             ])
           ])
         )
       }
-
       createRoot(document.getElementById('root')).render(React.createElement(App))
     </script>
   </body>
